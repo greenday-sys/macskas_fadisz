@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NER Propaganda Generator 3000 v3</title>
+  <style>
+    :root {
+      --bg1: #2a1408;
+      --bg2: #4a210d;
+      --bg3: #7c2d12;
+      --card: rgba(255,255,255,0.10);
+      --card-2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.16);
+      --text: #fff7ed;
+      --muted: #fed7aa;
+      --accent: #fb923c;
+      --accent-2: #f97316;
+      --accent-3: #ea580c;
+      --green: #22c55e;
+      --red: #ef4444;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(251,146,60,0.35) 0%, transparent 28%),
+        radial-gradient(circle at top right, rgba(249,115,22,0.25) 0%, transparent 22%),
+        radial-gradient(circle at bottom center, rgba(234,88,12,0.22) 0%, transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 980px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 22px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .output {
+      min-height: 165px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.55rem;
+      line-height: 1.45;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .button-row,
+    .footer-row,
+    .slider-row,
+    .import-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #2b1207;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #2b1207;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #052e16;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #fb7185, #ef4444);
+      color: white;
+    }
+
+    .btn-neutral {
+      background: linear-gradient(135deg, #fdba74, #fb923c);
+      color: #2b1207;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      color: #ffedd5;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+
+    .history {
+      margin: 14px 0 0;
+      padding-left: 20px;
+    }
+
+    .history li {
+      margin-bottom: 8px;
+      color: #fff7ed;
+      line-height: 1.45;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .wordbank-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card-2);
+      padding: 16px;
+    }
+
+    .wordbank-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.98rem;
+      color: #ffedd5;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      min-height: 38px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff7ed;
+      border-radius: 999px;
+      padding: 7px 10px 7px 12px;
+      font-size: 0.87rem;
+      line-height: 1;
+    }
+
+    .tag button {
+      all: unset;
+      cursor: pointer;
+      font-weight: 700;
+      color: #fecaca;
+      line-height: 1;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .add-row input,
+    .bulk-box,
+    select,
+    textarea,
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.94rem;
+      outline: none;
+    }
+
+    .add-row input::placeholder,
+    .bulk-box::placeholder,
+    textarea::placeholder,
+    input[type="text"]::placeholder {
+      color: #fdba74;
+    }
+
+    .bulk-wrap,
+    .template-wrap,
+    .import-export-wrap {
+      margin-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 18px;
+    }
+
+    .muted-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.12);
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      color: #ffedd5;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .slider-box {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .slider-box input[type="range"] {
+      width: 100%;
+      accent-color: #fb923c;
+      margin: 8px 0;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .template-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .template-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+    }
+
+    .template-text {
+      color: #fff7ed;
+      font-size: 0.93rem;
+      line-height: 1.45;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+
+    .hint-code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.9rem;
+      color: #ffedd5;
+    }
+
+    .status {
+      font-size: 0.92rem;
+      color: #fde68a;
+      min-height: 22px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .output {
+        font-size: 1.2rem;
+        min-height: 120px;
+      }
+
+      h1 {
+        font-size: 1.7rem;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="topbar">
+        <div>
+          <h1>NER Propaganda Generator 3000 v3</h1>
+          <p class="subtitle">
+            A végső forma: szerkeszthető szóbank, import/export, saját sablonok, és egy csúszka,
+            amivel szabályozhatod, hogy csak plakátszagú legyen, vagy teljesen elszálljon az egész.
+          </p>
+        </div>
+        <div class="pill">final boss edition</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="output" id="output">
+          Kattints, és megszületik az új abszurd kampányüzenet.
+        </div>
+
+        <div class="slider-box">
+          <div class="section-title">Hihetőség vs teljes agymenés</div>
+          <div class="small">
+            Balra inkább plakátszagú, jobbra teljes Frankenstein.
+          </div>
+          <input type="range" id="chaosSlider" min="0" max="100" value="55" />
+          <div class="slider-labels">
+            <span>Inkább hihető</span>
+            <strong id="chaosValue">55%</strong>
+            <span>Teljes agymenés</span>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn-primary" onclick="generateSlogan()">🎰 Új kampány</button>
+          <button class="btn-secondary" onclick="generateMegaSlogan()">💣 Ultra-mutáns</button>
+          <button class="btn-success" onclick="copySlogan()">📋 Másolás</button>
+          <button class="btn-danger" onclick="resetDefaults()">♻️ Gyári visszaállítás</button>
+        </div>
+
+        <h2 class="section-title">Legutóbbi gyöngyszemek</h2>
+        <ol id="history" class="history"></ol>
+
+        <div class="muted-box">
+          Sablonváltozók a saját template-ekhez:
+          <span class="hint-code">{enemy}</span>,
+          <span class="hint-code">{enemyPair}</span>,
+          <span class="hint-code">{danger}</span>,
+          <span class="hint-code">{protectedThing}</span>,
+          <span class="hint-code">{solution}</span>,
+          <span class="hint-code">{extra}</span>,
+          <span class="hint-code">{opener}</span>,
+          <span class="hint-code">{ultraTag}</span>
+        </div>
+
+        <div class="template-wrap">
+          <h2 class="section-title">Saját sablon hozzáadása</h2>
+          <p class="small">
+            Írj saját mondatmintát a fenti változókkal. A generátor ezeket is használni fogja.
+          </p>
+
+          <textarea
+            id="templateInput"
+            rows="4"
+            placeholder="{enemy} és {enemyPair} együtt {danger} {protectedThing}, de {solution}. {extra}"
+          ></textarea>
+
+          <div class="footer-row">
+            <button class="btn-primary" onclick="addTemplate()">➕ Sablon hozzáadása</button>
+            <button class="btn-neutral" onclick="insertExampleTemplate()">✨ Minta beszúrása</button>
+          </div>
+
+          <div id="templateList" class="template-list"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="section-title">Szóbank szerkesztő</h2>
+        <p class="small">
+          Bővítheted vagy tisztíthatod a teljes propaganda-készletet. Minden automatikusan mentődik.
+        </p>
+
+        <div class="editor-grid" id="editorGrid"></div>
+
+        <div class="bulk-wrap">
+          <h2 class="section-title">Tömeges hozzáadás</h2>
+          <p class="small">
+            Válassz kategóriát, és illessz be több új elemet soronként.
+          </p>
+
+          <div class="footer-row">
+            <select id="bulkCategory"></select>
+          </div>
+
+          <textarea
+            id="bulkInput"
+            class="bulk-box"
+            rows="7"
+            placeholder="Példa:&#10;Karácsony Gergely&#10;a háttérhatalom&#10;energiaválság&#10;a magyar valóság"
+          ></textarea>
+
+          <div class="footer-row">
+            <button class="btn-primary" onclick="bulkAdd()">➕ Tömeges hozzáadás</button>
+            <button class="btn-danger" onclick="clearBulk()">🧹 Mező törlése</button>
+          </div>
+        </div>
+
+        <div class="import-export-wrap">
+          <h2 class="section-title">Export / import</h2>
+          <p class="small">
+            Kiexportálhatod az egész szóbankot, a sablonokat és a beállításokat JSON-ba, majd később visszatöltheted.
+          </p>
+
+          <div class="footer-row">
+            <button class="btn-success" onclick="exportConfig()">⬇️ Export JSON</button>
+          </div>
+
+          <div class="import-row">
+            <input type="file" id="importFile" accept=".json,application/json" />
+            <button class="btn-primary" onclick="importConfig()">⬆️ Import JSON</button>
+          </div>
+
+          <div id="status" class="status"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "propaganda3000_v3_wordbanks";
+    const HISTORY_KEY = "propaganda3000_v3_history";
+    const TEMPLATE_KEY = "propaganda3000_v3_templates";
+    const CHAOS_KEY = "propaganda3000_v3_chaos";
+
+    const defaultBanks = {
+      enemies: [
+        "Brüsszel",
+        "Ursula",
+        "Manfred Weber",
+        "Zelenszkij",
+        "Ukrajna",
+        "Soros",
+        "a dollárbaloldal",
+        "a globalisták",
+        "a migránsok",
+        "a háborúpárti elit",
+        "a rezsiellenes erők",
+        "a brüsszeli bürokraták"
+      ],
+      enemyPairs: [
+        "Brüsszel és Ursula",
+        "Ursula és Manfred Weber",
+        "Brüsszel és Zelenszkij",
+        "a dollárbaloldal és Ukrajna",
+        "Soros és Brüsszel",
+        "Ursula, Weber és Zelenszkij",
+        "Brüsszel és a háborúpárti elit",
+        "a globalisták és a rezsiellenes erők"
+      ],
+      dangers: [
+        "elvenné",
+        "veszélyezteti",
+        "támadja",
+        "lerombolná",
+        "tönkretenné",
+        "drágává tenné",
+        "háborúba sodorná",
+        "feláldozná",
+        "kiárusítaná",
+        "megszüntetné"
+      ],
+      protectedThings: [
+        "a rezsicsökkentést",
+        "a magyar családokat",
+        "Magyarország szuverenitását",
+        "a békét",
+        "a magyar emberek pénzét",
+        "a nyugdíjakat",
+        "a magyar munkahelyeket",
+        "az ország biztonságát",
+        "a határainkat",
+        "a jövőnket"
+      ],
+      solutions: [
+        "mi megvédjük",
+        "mi megállítjuk őket",
+        "mi nemet mondunk",
+        "mi nem engedünk",
+        "mi kiállunk a magyarok mellett",
+        "mi megőrizzük",
+        "mi megóvjuk",
+        "mi nem hátrálunk"
+      ],
+      extras: [
+        "Mert nekünk Magyarország az első.",
+        "A magyar emberek nem kérnek ebből.",
+        "A tét most is a jövőnk.",
+        "Ezért kell megvédenünk, amit közösen elértünk.",
+        "A választás világos.",
+        "Mi a béke oldalán állunk.",
+        "Erről szól a következő csata is.",
+        "A magyar emberek döntését tiszteletben kell tartani."
+      ],
+      absurdOpeners: [
+        "Újabb támadás indult",
+        "Megint lecsaptak",
+        "Már megint támad",
+        "Ismét akcióba lépett",
+        "Most új szintre kapcsolt"
+      ],
+      ultraTags: [
+        "plakátkompatibilis üzenet",
+        "kampányriadó",
+        "nemzeti vészhelyzet",
+        "szuverenitásvédelmi közlemény",
+        "rezsivédelmi riasztás"
+      ]
+    };
+
+    const defaultTemplates = [
+      "{enemy} {danger} {protectedThing} – {solution}. {extra}",
+      "{enemyPair} {danger} {protectedThing}. {solution}. {extra}",
+      "{opener}: {enemy} {danger} {protectedThing}. {solution}. {extra}",
+      "{protectedThing} most is célkeresztben van: {enemyPair} {danger}. {solution}. {extra}",
+      "{ultraTag}: {enemyPair} és {enemy} együtt {danger} {protectedThing}, de {solution}. {extra}"
+    ];
+
+    const categoryLabels = {
+      enemies: "Egyszerű szereplők",
+      enemyPairs: "Összetett szereplők",
+      dangers: "Veszélyek",
+      protectedThings: "Védendő dolgok",
+      solutions: "Megoldások",
+      extras: "Extra mondatok",
+      absurdOpeners: "Nyitómondatok",
+      ultraTags: "Ultra címkék"
+    };
+
+    let banks = loadBanks();
+    let historyItems = loadHistory();
+    let templates = loadTemplates();
+    let chaosLevel = loadChaos();
+    let lastSlogan = "";
+
+    const output = document.getElementById("output");
+    const editorGrid = document.getElementById("editorGrid");
+    const historyList = document.getElementById("history");
+    const bulkCategory = document.getElementById("bulkCategory");
+    const bulkInput = document.getElementById("bulkInput");
+    const templateInput = document.getElementById("templateInput");
+    const templateList = document.getElementById("templateList");
+    const chaosSlider = document.getElementById("chaosSlider");
+    const chaosValue = document.getElementById("chaosValue");
+    const statusBox = document.getElementById("status");
+
+    function deepClone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function loadBanks() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return deepClone(defaultBanks);
+
+        const parsed = JSON.parse(saved);
+        const merged = deepClone(defaultBanks);
+
+        for (const key of Object.keys(defaultBanks)) {
+          if (Array.isArray(parsed[key])) {
+            merged[key] = [...new Set(parsed[key].map(v => String(v).trim()).filter(Boolean))];
+          }
+        }
+
+        return merged;
+      } catch {
+        return deepClone(defaultBanks);
+      }
+    }
+
+    function saveBanks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(banks));
+    }
+
+    function loadHistory() {
+      try {
+        const saved = localStorage.getItem(HISTORY_KEY);
+        if (!saved) return [];
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.slice(0, 12) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory() {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(historyItems.slice(0, 12)));
+    }
+
+    function loadTemplates() {
+      try {
+        const saved = localStorage.getItem(TEMPLATE_KEY);
+        if (!saved) return [...defaultTemplates];
+        const parsed = JSON.parse(saved);
+        const cleaned = Array.isArray(parsed)
+          ? parsed.map(v => String(v).trim()).filter(Boolean)
+          : [];
+        return cleaned.length ? [...new Set(cleaned)] : [...defaultTemplates];
+      } catch {
+        return [...defaultTemplates];
+      }
+    }
+
+    function saveTemplates() {
+      localStorage.setItem(TEMPLATE_KEY, JSON.stringify(templates));
+    }
+
+    function loadChaos() {
+      try {
+        const saved = localStorage.getItem(CHAOS_KEY);
+        const n = Number(saved);
+        return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 55;
+      } catch {
+        return 55;
+      }
+    }
+
+    function saveChaos() {
+      localStorage.setItem(CHAOS_KEY, String(chaosLevel));
+    }
+
+    function randomItem(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function chance(percent) {
+      return Math.random() * 100 < percent;
+    }
+
+    function capitalizeFirst(text) {
+      if (!text || typeof text !== "string") return text;
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function setStatus(text, isError = false) {
+      statusBox.textContent = text;
+      statusBox.style.color = isError ? "#fecaca" : "#fde68a";
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = "";
+      historyItems.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        historyList.appendChild(li);
+      });
+    }
+
+    function addToHistory(text) {
+      historyItems.unshift(text);
+      historyItems = [...new Set(historyItems)].slice(0, 8);
+      saveHistory();
+      renderHistory();
+    }
+
+    function buildContext() {
+      return {
+        enemy: randomItem(banks.enemies),
+        enemyPair: randomItem(banks.enemyPairs.length ? banks.enemyPairs : banks.enemies),
+        danger: randomItem(banks.dangers),
+        protectedThing: randomItem(banks.protectedThings),
+        solution: randomItem(banks.solutions),
+        extra: chance(45 + chaosLevel / 2) && banks.extras.length ? randomItem(banks.extras) : "",
+        opener: randomItem(banks.absurdOpeners.length ? banks.absurdOpeners : ["Újabb fejlemény"]),
+        ultraTag: randomItem(banks.ultraTags.length ? banks.ultraTags : ["különleges közlemény"])
+      };
+    }
+
+    function fillTemplate(template, context) {
+      let text = template
+        .replaceAll("{enemy}", context.enemy)
+        .replaceAll("{enemyPair}", context.enemyPair)
+        .replaceAll("{danger}", context.danger)
+        .replaceAll("{protectedThing}", context.protectedThing)
+        .replaceAll("{solution}", context.solution)
+        .replaceAll("{extra}", context.extra)
+        .replaceAll("{opener}", context.opener)
+        .replaceAll("{ultraTag}", context.ultraTag);
+
+      text = text
+        .replace(/\s+\./g, ".")
+        .replace(/\s+,/g, ",")
+        .replace(/\s+:/g, ":")
+        .replace(/\s+–/g, " –")
+        .replace(/\.\s*\./g, ".")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      if (text && !/[.!?]$/.test(text)) {
+        text += ".";
+      }
+
+      return capitalizeFirst(text);
+    }
+
+    function getWeightedTemplatePool(mode = "normal") {
+      const lowChaosTemplates = [
+        "{enemy} {danger} {protectedThing} – {solution}. {extra}",
+        "{enemyPair} {danger} {protectedThing}. {solution}. {extra}",
+        "{protectedThing} most is célkeresztben van: {enemyPair} {danger}. {solution}. {extra}"
+      ];
+
+      const highChaosTemplates = [
+        "{opener}: {enemy} {danger} {protectedThing}. {solution}. {extra}",
+        "{ultraTag}: {enemyPair} és {enemy} együtt {danger} {protectedThing}, de {solution}. {extra}",
+        "{enemyPair} árnyékában {enemy} is megjelent, hogy {danger} {protectedThing}. {solution}. {extra}",
+        "A helyzet súlyos: {enemyPair}, sőt {enemy} is {danger} {protectedThing}. De {solution}. {extra}"
+      ];
+
+      const pool = [];
+
+      templates.forEach(t => pool.push(t));
+
+      if (chaosLevel < 35) {
+        lowChaosTemplates.forEach(t => pool.push(t, t));
+        if (mode === "mega") {
+          highChaosTemplates.forEach(t => pool.push(t));
+        }
+      } else if (chaosLevel < 70) {
+        lowChaosTemplates.forEach(t => pool.push(t));
+        highChaosTemplates.forEach(t => pool.push(t));
+      } else {
+        highChaosTemplates.forEach(t => pool.push(t, t));
+        lowChaosTemplates.forEach(t => pool.push(t));
+      }
+
+      if (mode === "mega") {
+        highChaosTemplates.forEach(t => pool.push(t, t));
+      }
+
+      return pool;
+    }
+
+    function generateSlogan() {
+      const context = buildContext();
+      const pool = getWeightedTemplatePool("normal");
+      const template = randomItem(pool);
+      lastSlogan = fillTemplate(template, context);
+      output.textContent = lastSlogan;
+      addToHistory(lastSlogan);
+    }
+
+    function generateMegaSlogan() {
+      const context = buildContext();
+
+      if (chance(45 + chaosLevel / 2)) {
+        context.enemy = randomItem(banks.enemies);
+        context.enemyPair = `${randomItem(banks.enemyPairs.length ? banks.enemyPairs : banks.enemies)} és ${randomItem(banks.enemies)}`;
+      }
+
+      if (chance(40 + chaosLevel / 2)) {
+        context.extra = [
+          context.extra,
+          randomItem(banks.extras.length ? banks.extras : ["A magyar emberek döntését tiszteletben kell tartani."])
+        ].filter(Boolean).join(" ");
+      }
+
+      const pool = getWeightedTemplatePool("mega");
+      const template = randomItem(pool);
+      lastSlogan = fillTemplate(template, context);
+      output.textContent = lastSlogan;
+      addToHistory(lastSlogan);
+    }
+
+    async function copySlogan() {
+      if (!lastSlogan) {
+        output.textContent = "Előbb generálj egy szlogent 😄";
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(lastSlogan);
+        output.textContent = "Kimásolva: " + lastSlogan;
+      } catch {
+        output.textContent = "A másolás nem sikerült, de itt a szlogen: " + lastSlogan;
+      }
+    }
+
+    function addItem(category, value) {
+      const cleaned = String(value).trim();
+      if (!cleaned) return;
+
+      if (!banks[category].includes(cleaned)) {
+        banks[category].push(cleaned);
+        saveBanks();
+        renderEditor();
+        renderBulkSelect();
+      }
+    }
+
+    function removeItem(category, index) {
+      banks[category].splice(index, 1);
+      saveBanks();
+      renderEditor();
+      renderBulkSelect();
+    }
+
+    function renderEditor() {
+      editorGrid.innerHTML = "";
+
+      Object.keys(categoryLabels).forEach(category => {
+        const card = document.createElement("div");
+        card.className = "wordbank-card";
+
+        const title = document.createElement("h3");
+        title.textContent = categoryLabels[category];
+        card.appendChild(title);
+
+        const tags = document.createElement("div");
+        tags.className = "tag-list";
+
+        banks[category].forEach((item, index) => {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+
+          const text = document.createElement("span");
+          text.textContent = item;
+
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "×";
+          removeBtn.title = "Törlés";
+          removeBtn.onclick = () => removeItem(category, index);
+
+          tag.appendChild(text);
+          tag.appendChild(removeBtn);
+          tags.appendChild(tag);
+        });
+
+        card.appendChild(tags);
+
+        const addRow = document.createElement("div");
+        addRow.className = "add-row";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Új elem hozzáadása...";
+
+        const addBtn = document.createElement("button");
+        addBtn.className = "btn-primary";
+        addBtn.textContent = "Hozzáad";
+        addBtn.onclick = () => {
+          addItem(category, input.value);
+          input.value = "";
+          input.focus();
+        };
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            addItem(category, input.value);
+            input.value = "";
+          }
+        });
+
+        addRow.appendChild(input);
+        addRow.appendChild(addBtn);
+        card.appendChild(addRow);
+
+        editorGrid.appendChild(card);
+      });
+    }
+
+    function renderBulkSelect() {
+      bulkCategory.innerHTML = "";
+      Object.keys(categoryLabels).forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = categoryLabels[category];
+        bulkCategory.appendChild(option);
+      });
+    }
+
+    function bulkAdd() {
+      const category = bulkCategory.value;
+      const lines = bulkInput.value
+        .split("\n")
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      if (!lines.length) return;
+
+      lines.forEach(line => addItem(category, line));
+      bulkInput.value = "";
+      output.textContent = `Hozzáadva ${lines.length} új elem a(z) "${categoryLabels[category]}" kategóriához.`;
+    }
+
+    function clearBulk() {
+      bulkInput.value = "";
+    }
+
+    function renderTemplates() {
+      templateList.innerHTML = "";
+
+      templates.forEach((tpl, index) => {
+        const item = document.createElement("div");
+        item.className = "template-item";
+
+        const text = document.createElement("div");
+        text.className = "template-text";
+        text.textContent = tpl;
+
+        const actions = document.createElement("div");
+        actions.className = "footer-row";
+
+        const useBtn = document.createElement("button");
+        useBtn.className = "btn-neutral";
+        useBtn.textContent = "Teszteld";
+        useBtn.onclick = () => {
+          const context = buildContext();
+          const result = fillTemplate(tpl, context);
+          output.textContent = result;
+          lastSlogan = result;
+          addToHistory(result);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-danger";
+        deleteBtn.textContent = "Törlés";
+        deleteBtn.onclick = () => removeTemplate(index);
+
+        actions.appendChild(useBtn);
+        actions.appendChild(deleteBtn);
+
+        item.appendChild(text);
+        item.appendChild(actions);
+        templateList.appendChild(item);
+      });
+    }
+
+    function addTemplate() {
+      const value = templateInput.value.trim();
+      if (!value) return;
+
+      if (!templates.includes(value)) {
+        templates.push(value);
+        saveTemplates();
+        renderTemplates();
+        templateInput.value = "";
+      }
+    }
+
+    function removeTemplate(index) {
+      templates.splice(index, 1);
+
+      if (!templates.length) {
+        templates = [...defaultTemplates];
+      }
+
+      saveTemplates();
+      renderTemplates();
+    }
+
+    function insertExampleTemplate() {
+      templateInput.value = "{ultraTag}: {enemyPair} és {enemy} együtt {danger} {protectedThing}, de {solution}. {extra}";
+      templateInput.focus();
+    }
+
+    function exportConfig() {
+      const config = {
+        version: 3,
+        exportedAt: new Date().toISOString(),
+        chaosLevel,
+        banks,
+        templates
+      };
+
+      const blob = new Blob([JSON.stringify(config, null, 2)], {
+        type: "application/json"
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "propaganda3000_v3_config.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      setStatus("Export kész: propaganda3000_v3_config.json");
+    }
+
+    function importConfig() {
+      const fileInput = document.getElementById("importFile");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        setStatus("Előbb válassz ki egy JSON fájlt.", true);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+
+          if (!parsed || typeof parsed !== "object") {
+            throw new Error("Érvénytelen JSON.");
+          }
+
+          if (parsed.banks && typeof parsed.banks === "object") {
+            const merged = deepClone(defaultBanks);
+            for (const key of Object.keys(defaultBanks)) {
+              if (Array.isArray(parsed.banks[key])) {
+                merged[key] = [...new Set(parsed.banks[key].map(v => String(v).trim()).filter(Boolean))];
+              }
+            }
+            banks = merged;
+            saveBanks();
+          }
+
+          if (Array.isArray(parsed.templates)) {
+            const cleanedTemplates = parsed.templates
+              .map(v => String(v).trim())
+              .filter(Boolean);
+
+            templates = cleanedTemplates.length ? [...new Set(cleanedTemplates)] : [...defaultTemplates];
+            saveTemplates();
+          }
+
+          if (Number.isFinite(Number(parsed.chaosLevel))) {
+            chaosLevel = Math.max(0, Math.min(100, Number(parsed.chaosLevel)));
+            chaosSlider.value = chaosLevel;
+            chaosValue.textContent = `${chaosLevel}%`;
+            saveChaos();
+          }
+
+          renderEditor();
+          renderBulkSelect();
+          renderTemplates();
+          setStatus("Import sikeres.");
+          fileInput.value = "";
+        } catch (err) {
+          setStatus("Az import nem sikerült. Ellenőrizd, hogy jó JSON fájlt választottál-e.", true);
+        }
+      };
+
+      reader.readAsText(file, "utf-8");
+    }
+
+    function resetDefaults() {
+      const ok = confirm("Biztosan visszaállítod a teljes szóbankot, sablonokat és beállításokat a gyári alapokra?");
+      if (!ok) return;
+
+      banks = deepClone(defaultBanks);
+      templates = [...defaultTemplates];
+      historyItems = [];
+      chaosLevel = 55;
+      lastSlogan = "";
+
+      saveBanks();
+      saveTemplates();
+      saveHistory();
+      saveChaos();
+
+      chaosSlider.value = chaosLevel;
+      chaosValue.textContent = `${chaosLevel}%`;
+
+      renderEditor();
+      renderBulkSelect();
+      renderHistory();
+      renderTemplates();
+      output.textContent = "Visszaállítva a gyári propaganda-alapcsomag 😄";
+      setStatus("Gyári visszaállítás kész.");
+    }
+
+    chaosSlider.value = chaosLevel;
+    chaosValue.textContent = `${chaosLevel}%`;
+
+    chaosSlider.addEventListener("input", () => {
+      chaosLevel = Number(chaosSlider.value);
+      chaosValue.textContent = `${chaosLevel}%`;
+      saveChaos();
+    });
+
+    renderEditor();
+    renderBulkSelect();
+    renderHistory();
+    renderTemplates();
+  </script>
+</body>
+</html>

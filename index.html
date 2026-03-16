@@ -1,5 +1,286 @@
-<h1>GG propaganda lab</h1>
 
-<a href="ner_generator_ultimate.html">NER generátor</a>
-<br>
-<a href="propaganda_3000.html">Propaganda 3000</a>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GG Propaganda Lab</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#111827;
+      --card:rgba(17,24,39,.82);
+      --line:rgba(255,255,255,.10);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --subtle:#94a3b8;
+      --orange:#f97316;
+      --pink:#fb7185;
+      --green:#22c55e;
+      --blue:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(249,115,22,.18), transparent 24%),
+        radial-gradient(circle at top right, rgba(96,165,250,.14), transparent 28%),
+        radial-gradient(circle at bottom center, rgba(34,197,94,.10), transparent 30%),
+        linear-gradient(180deg,var(--bg1),var(--bg2) 45%, #0f172a);
+      min-height:100vh;
+    }
+    .wrap{width:min(1180px,100%); margin:0 auto; padding:28px;}
+    .hero{
+      border:1px solid var(--line);
+      border-radius:32px;
+      overflow:hidden;
+      background:
+        linear-gradient(135deg, rgba(249,115,22,.16), rgba(251,113,133,.10)),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+      box-shadow:0 24px 70px rgba(0,0,0,.35);
+    }
+    .hero-inner{padding:34px;}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color:#fde68a; font-size:12px; font-weight:800;
+      text-transform:uppercase; letter-spacing:.12em;
+    }
+    h1{
+      margin:18px 0 12px;
+      font-size:clamp(40px,7vw,78px);
+      line-height:.92;
+      letter-spacing:-.05em;
+    }
+    .lead{
+      max-width:760px;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.65;
+      margin:0;
+    }
+    .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:24px;}
+    .btn{
+      text-decoration:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:14px 18px;
+      border-radius:16px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.10);
+      transition:.15s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{
+      color:white;
+      background:linear-gradient(135deg,var(--orange),var(--pink));
+      box-shadow:0 14px 28px rgba(249,115,22,.24);
+      border:none;
+    }
+    .btn.secondary{
+      color:#e2e8f0;
+      background:#182235;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:24px;
+      margin-top:24px;
+    }
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:24px;
+      box-shadow:0 20px 60px rgba(0,0,0,.22);
+    }
+    .section-kicker{
+      color:var(--subtle);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+      margin-top:18px;
+    }
+    .card{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      padding:22px;
+      min-height:260px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        linear-gradient(180deg,#0f172a,#1f2937);
+    }
+    .card.orange{
+      background:
+        radial-gradient(circle at top right, rgba(249,115,22,.24), transparent 28%),
+        linear-gradient(180deg,#0f172a,#111827 36%, #7c2d12 120%);
+    }
+    .card.blue{
+      background:
+        radial-gradient(circle at top right, rgba(96,165,250,.24), transparent 28%),
+        linear-gradient(180deg,#0f172a,#111827 36%, #1d4ed8 120%);
+    }
+    .card.green{
+      background:
+        radial-gradient(circle at top right, rgba(34,197,94,.22), transparent 28%),
+        linear-gradient(180deg,#0f172a,#111827 36%, #166534 120%);
+    }
+    .card h2{
+      margin:6px 0 10px;
+      font-size:28px;
+      line-height:1;
+      letter-spacing:-.03em;
+    }
+    .card p{
+      color:var(--muted);
+      line-height:1.6;
+      margin:0 0 18px;
+      max-width:32ch;
+    }
+    .card .mini{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#fde68a;
+      font-weight:800;
+    }
+    .card .go{
+      margin-top:auto;
+      display:inline-flex;
+      text-decoration:none;
+      color:white;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:800;
+    }
+    .stack{display:grid; gap:18px;}
+    .list{
+      display:grid; gap:10px; margin:16px 0 0;
+    }
+    .list-item{
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:#e5e7eb;
+      line-height:1.45;
+    }
+    .muted{color:var(--muted)}
+    .note{
+      margin-top:12px;
+      font-size:14px;
+      color:var(--subtle);
+      line-height:1.6;
+    }
+    .footer{
+      margin-top:24px;
+      padding:20px 4px 8px;
+      color:var(--subtle);
+      font-size:14px;
+      line-height:1.6;
+    }
+    code{
+      background:rgba(255,255,255,.08);
+      padding:2px 8px;
+      border-radius:999px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      color:#e2e8f0;
+    }
+    @media (max-width: 900px){
+      .grid,.cards{grid-template-columns:1fr}
+      .wrap{padding:16px}
+      .hero-inner,.panel{padding:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="badge">GG Propaganda Lab • szatirikus webapp gyűjtemény</div>
+        <h1>GG<br>Propaganda Lab</h1>
+        <p class="lead">
+          Egy teljesen ironikus mini labor, ahol a túltekert kampányszlogenek, a propaganda-fröcsögés és a háborúellenes plakátok végre kulturáltan, gombnyomásra termelődnek.
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="./ner-generator.html">NER generátor megnyitása</a>
+          <a class="btn secondary" href="#projects">Mutasd a projekteket</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid" id="projects">
+      <section class="panel">
+        <div class="section-kicker">Projektek</div>
+        <div class="cards">
+          <article class="card orange">
+            <div class="mini">Aktív oldal</div>
+            <h2>NER generátor</h2>
+            <p>Szlogen generátor, NER Bullshit Bingo, saját szavak, háborúellenes plakátmotor, kampány-mém export és megosztós funkciók.</p>
+            <a class="go" href="./ner-generator.html">Belépés →</a>
+          </article>
+
+          <article class="card blue">
+            <div class="mini">Második slot</div>
+            <h2>Propaganda 3000</h2>
+            <p>Ennek készítettem külön helyet is. Ha a saját <code>propaganda3000.html</code> fájlodat feltöltöd ugyanebbe a repóba, innen azonnal elérhető lesz.</p>
+            <a class="go" href="./propaganda3000.html">Megnyitás →</a>
+          </article>
+        </div>
+
+        <div class="note">
+          Most a landing oldal és a NER generátor teljesen készen van. A Propaganda 3000-et direkt bekötöttem helynek, hogy csak fel kelljen dobni külön fájlként a repóba.
+        </div>
+      </section>
+
+      <aside class="stack">
+        <section class="panel">
+          <div class="section-kicker">Mit tud ez a site?</div>
+          <div class="list">
+            <div class="list-item">Random propaganda szlogen generálás több móddal</div>
+            <div class="list-item">Háborúellenes plakát és kampánymém export PNG-be</div>
+            <div class="list-item">Saját kulcsszavak hozzáadása futás közben</div>
+            <div class="list-item">Tökéletes Messenger-kompatibilis publikus link GitHub Pages-en</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-kicker">Repo struktúra</div>
+          <div class="list">
+            <div class="list-item"><code>index.html</code> → menő főoldal</div>
+            <div class="list-item"><code>ner-generator.html</code> → a mostani ultimate NER generátor</div>
+            <div class="list-item"><code>propaganda3000.html</code> → ide jöhet a második appod</div>
+          </div>
+        </section>
+
+        <section class="panel green panel">
+          <div class="section-kicker">URL minta</div>
+          <div class="list">
+            <div class="list-item"><code>/</code> → főoldal</div>
+            <div class="list-item"><code>/ner-generator.html</code> → NER generátor</div>
+            <div class="list-item"><code>/propaganda3000.html</code> → Propaganda 3000</div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="footer">
+      GG Propaganda Lab — szatíra, mémenergia, túlkomponált kampányvibe. Ha később akarod, ezt simán át lehet alakítani rendes többoldalas mini webappá is külön menüvel, analytics-szel és egyedi domainnel.
+    </div>
+  </div>
+</body>
+</html>
